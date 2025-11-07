@@ -12,7 +12,7 @@ __pycache__/
 *.swo
 .DS_Store
 
-# Environment and secrets (more specific)
+# Environment and secrets
 .env
 .env.local
 .env.*.local
@@ -22,12 +22,6 @@ __pycache__/
 *.key
 secrets/
 credentials/
-*_key.*
-*_keys.*
-*_secret.*
-*_secrets.*
-*_credential.*
-*_credentials.*
 
 # Build and Distribution
 dist/
@@ -35,16 +29,23 @@ build/
 *.egg-info/
 pip-log.txt
 
+# Cache and Temporary files
+.cache/
+*.log
+*.tmp
+*.temp
+logs/
+uploads/
+
+# Dependencies
+node_modules/
+
 # Large files and binaries
-*.dll
-*.exe
-*.pyd
-*.so
-*.dylib
-*.bin
-*.model
-*.pth
-*.onnx
+*.dll filter=lfs diff=lfs merge=lfs -text
+*.exe filter=lfs diff=lfs merge=lfs -text
+*.pyd filter=lfs diff=lfs merge=lfs -text
+*.so filter=lfs diff=lfs merge=lfs -text
+*.dylib filter=lfs diff=lfs merge=lfs -text
 
 # Media files
 *.mp4
