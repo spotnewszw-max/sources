@@ -5,14 +5,29 @@ env*/
 __pycache__/
 *.py[cod]
 
-# IDE
+# IDE and Editor files
 .vscode/
 .idea/
 *.swp
+*.swo
+.DS_Store
 
-# Environment variables
+# Environment and secrets (more specific)
 .env
-.env.*
+.env.local
+.env.*.local
+.env.development
+.env.test
+.env.production
+*.key
+secrets/
+credentials/
+*_key.*
+*_keys.*
+*_secret.*
+*_secrets.*
+*_credential.*
+*_credentials.*
 
 # Build and Distribution
 dist/
@@ -50,4 +65,3 @@ node_modules/
 *.log
 *.tmp
 *.temp
-.DS_Store
