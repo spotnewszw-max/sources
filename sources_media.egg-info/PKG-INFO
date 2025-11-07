@@ -1,0 +1,5 @@
+Metadata-Version: 2.4
+Name: sources-media
+Version: 0.1.0
+Requires-Dist: redis>=7.0.0
+Dynamic: requires-dist

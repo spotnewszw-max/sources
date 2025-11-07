@@ -1,0 +1,37 @@
+name: Auto-merge Dependabot PRs
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    
+    permissions:
+      pull-requests: write
+      contents: write
+
+    steps:
+      - name: Auto-merge patch updates
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          if [[ $PR_TITLE =~ "Bump .+ from .+ to .+" ]] && [[ $PR_TITLE =~ "[0-9]+\.[0-9]+\.[0-9]+ to [0-9]+\.[0-9]+\.[0-9]+" ]]; then
+            OLD_VERSION=$(echo $PR_TITLE | grep -oP "from \K[0-9]+\.[0-9]+\.[0-9]+" || echo "")
+            NEW_VERSION=$(echo $PR_TITLE | grep -oP "to \K[0-9]+\.[0-9]+\.[0-9]+" || echo "")
+            
+            if [ ! -z "$OLD_VERSION" ] && [ ! -z "$NEW_VERSION" ]; then
+              OLD_MAJOR=$(echo $OLD_VERSION | cut -d. -f1)
+              OLD_MINOR=$(echo $OLD_VERSION | cut -d. -f2)
+              NEW_MAJOR=$(echo $NEW_VERSION | cut -d. -f1)
+              NEW_MINOR=$(echo $NEW_VERSION | cut -d. -f2)
+              
+              if [ "$OLD_MAJOR" = "$NEW_MAJOR" ] && [ "$OLD_MINOR" = "$NEW_MINOR" ]; then
+                gh pr merge "${{ github.event.pull_request.number }}" --auto --merge
+                echo "Auto-merged patch update PR"
+              fi
+            fi
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

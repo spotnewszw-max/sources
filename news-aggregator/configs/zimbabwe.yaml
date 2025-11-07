@@ -1,0 +1,663 @@
+application:
+  name: Zimbabwe News Aggregator
+  version: 1.0.0
+  description: News aggregator focused on Zimbabwe news, policy makers, and African content
+
+database:
+  url: sqlite:///./news_zimbabwe.db
+  echo: false
+
+logging:
+  level: INFO
+  handlers:
+    - console
+    - file
+  file:
+    path: logs/zimbabwe.log
+    max_size: 10MB
+    backup_count: 5
+
+api:
+  prefix: /api/v1
+  docs_url: /docs
+  redoc_url: /redoc
+
+# NEWS SOURCES CONFIGURATION
+fetcher:
+  # Fetch interval in minutes
+  interval: 60
+  
+  # Timeout for requests in seconds
+  timeout: 30
+  
+  # Enable content filtering for Zimbabwe relevance
+  filter_enabled: true
+  filter_keywords:
+    - zimbabwe
+    - zim
+    - harare
+    - bulawayo
+    - mnangagwa
+    - chamisa
+    - rtgs
+    - economy
+    - politics
+    - business
+  
+  sources:
+    # ===== ZIMBABWE LOCAL NEWS (Primary) =====
+    - name: NewsDay Zimbabwe
+      url: https://www.newsday.co.zw/feed
+      type: rss
+      category: local_news
+      priority: 1
+      enabled: true
+      country: zimbabwe
+      
+    - name: The Herald Zimbabwe
+      url: https://www.herald.co.zw/feed
+      type: rss
+      category: local_news
+      priority: 1
+      enabled: true
+      country: zimbabwe
+      
+    - name: Zimbabwe Independent
+      url: https://www.independentzimbabwe.com/feed
+      type: rss
+      category: investigative
+      priority: 2
+      enabled: true
+      country: zimbabwe
+      
+    - name: Bulawayo24
+      url: https://bulawayo24.com/feed
+      type: rss
+      category: local_news
+      priority: 2
+      enabled: true
+      country: zimbabwe
+      
+    - name: Techzim
+      url: https://www.techzim.co.zw/feed
+      type: rss
+      category: technology
+      priority: 2
+      enabled: true
+      country: zimbabwe
+      
+    - name: ZimFact
+      url: https://zimfact.org/feed
+      type: rss
+      category: fact_checking
+      priority: 2
+      enabled: true
+      country: zimbabwe
+      
+    - name: The Source Zimbabwe
+      url: https://thesource.co.zw/feed
+      type: rss
+      category: business
+      priority: 2
+      enabled: true
+      country: zimbabwe
+    
+    # ===== AFRICAN NEWS (Secondary - Zimbabwe focus) =====
+    - name: AllAfrica Zimbabwe
+      url: https://allafrica.com/zimbabwe/feed
+      type: rss
+      category: african_news
+      priority: 3
+      enabled: true
+      country: africa
+      
+    - name: Africa News
+      url: https://www.africanews.com/feed
+      type: rss
+      category: african_news
+      priority: 3
+      enabled: true
+      country: africa
+    
+    - name: RFI Africa
+      url: https://www.rfi.fr/en/africa/feed
+      type: rss
+      category: international_news
+      priority: 3
+      enabled: true
+      country: international
+      
+    - name: VOA Africa
+      url: https://www.voanews.com/africa/feed
+      type: rss
+      category: international_news
+      priority: 3
+      enabled: true
+      country: international
+    
+    # ===== ECONOMIC NEWS =====
+    - name: Trading Economics Zimbabwe
+      url: https://tradingeconomics.com/zimbabwe/rss
+      type: rss
+      category: economics
+      priority: 2
+      enabled: true
+      country: zimbabwe
+
+# SOCIAL MEDIA MONITORING (To be configured with API keys)
+social_media:
+  twitter:
+    enabled: false  # Set to true after getting API key
+    bearer_token: ${TWITTER_BEARER_TOKEN}
+    search_queries:
+      - "#Zimbabwe"
+      - "#ZimEconomy"
+      - "#Harare"
+      - "#ZimPolitics"
+      - "#ZimBusiness"
+    monitor_accounts:
+      - edmnangagwa          # President
+      - nelsonchamisa        # Opposition
+      - MthuliNcube          # Finance Minister
+      - strive               # Strive Masiyiwa
+      - daddyhope            # Hopewell Chin'ono
+      - VinceMusewe          # Economist
+    tweets_per_hour: 100
+    languages:
+      - en
+      - zu
+  
+  facebook:
+    enabled: false  # Set to true after getting API key
+    access_token: ${FACEBOOK_ACCESS_TOKEN}
+    monitor_pages:
+      - zimbabwegovernment
+      - newsdayzimbabwe
+      - herald.co.zw
+      - bulawayo24
+    posts_per_day: 50
+
+# CONTENT FILTERING
+content_filter:
+  # Minimum relevance score (0-1) to include article
+  min_relevance: 0.6
+  
+  # Prefer local Zimbabwe sources
+  prefer_local: true
+  
+  # Filter out duplicate titles
+  remove_duplicates: true
+  
+  # Language detection
+  languages:
+    - en
+    - zu
+
+summarizer:
+  model: "facebook/bart-large-cnn"
+  max_length: 150
+  min_length: 50
+
+celery:
+  broker_url: redis://localhost:6379/0
+  result_backend: redis://localhost:6379/0
+  task_serializer: json
+  timezone: UTC
+
+cors:
+  allow_origins:
+    - "*"
+  allow_methods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+  allow_headers:
+    - Content-Type
+    - Authorization
+
+# SEARCH & TRENDING
+trending:
+  # Track trending topics
+  enable_trending: true
+  
+  # Update trending topics every N minutes
+  update_interval: 30
+  
+  # Keywords to track
+  keywords:
+    - zimbabwe
+    - economy
+    - politics
+    - business
+    - technology
+
+# CACHING
+cache:
+  enabled: true
+  ttl_minutes: 30
+
+# ============================================================
+# THINK TANK SYSTEM - AI-POWERED ANALYSIS & ARTICLE GENERATION
+# ============================================================
+think_tank:
+  # Enable/disable entire think tank system
+  enabled: true
+  
+  # ARTICLE GENERATION SETTINGS
+  article_generation:
+    enabled: true
+    
+    # Auto-publish articles with confidence >= this threshold
+    auto_publish: true
+    confidence_threshold: 0.65
+    
+    # Flag articles for manual review below this threshold
+    review_required_below: 0.65
+    
+    # Which article types to auto-generate
+    auto_generate_types:
+      - historical      # Rewrite history with context
+      - present         # Current situation analysis
+      - future          # Predictions and forecasts
+    
+    # Generate new articles on specific events
+    generate_on_new_posts: true
+    generate_on_trending_topics: true
+    
+    # Generate articles at this interval (hours)
+    generate_interval_hours: 24
+    
+    # LLM settings (optional enhancement)
+    use_llm_enhancement: false  # Set to true if using OpenAI/Claude
+    llm_model: "gpt-4"         # Options: gpt-3.5-turbo, gpt-4, claude-opus
+    llm_temperature: 0.7       # 0.0-1.0, higher = more creative
+    llm_max_tokens: 4000
+  
+  # ANALYSIS SETTINGS
+  analysis:
+    enabled: true
+    
+    # How far back to analyze for historical context
+    # Set to 0 for unlimited (use all available data)
+    historical_window_years: 0
+    
+    # Trend analysis time window (days)
+    trend_window_days: 30
+    
+    # Forecast period for predictions (days)
+    forecast_days: 90
+    
+    # Minimum articles needed before generating analysis
+    min_articles_for_analysis: 10
+    
+    # Topics to monitor (analyze all if empty)
+    topics_to_monitor:
+      - Politics
+      - Economy
+      - Agriculture
+      - Technology
+      - Health
+      - Education
+      - Media
+      - Security
+  
+  # SOCIAL MEDIA SCREENSHOT CAPTURE
+  social_media_capture:
+    enabled: true
+    
+    # Capture interval in minutes
+    capture_interval: 30
+    
+    # Max posts to capture per influencer per check
+    max_posts_per_check: 10
+    
+    # Storage settings
+    storage_path: "screenshots"
+    download_media: true              # Download and store images locally
+    
+    # OCR Settings (for text extraction from images)
+    ocr_enabled: true
+    ocr_language: "eng"               # Language for OCR
+    ocr_confidence_threshold: 0.5     # Min confidence for extracted text
+    
+    # Analysis
+    extract_entities: true            # Extract politicians, organizations
+    analyze_sentiment: true           # Analyze sentiment
+    extract_engagement: true          # Track likes, retweets, shares
+    
+    # Influencers to monitor
+    influencers:
+      twitter:
+        - "edmnangagwa"        # President Emmerson Mnangagwa
+        - "nelsonchamisa"      # Opposition Leader Nelson Chamisa
+        - "MthuliNcube"        # Finance Minister Mthuli Ncube
+        - "strive"             # Strive Masiyiwa (Entrepreneur)
+        - "daddyhope"          # Hopewell Chin'ono (Journalist)
+        - "VinceMusewe"        # Vince Musewe (Economist)
+      
+      facebook:
+        - "GovernmentZW"       # Government of Zimbabwe
+        - "ZimbabweIndependent"
+        - "NewsDay.co.zw"
+      
+      instagram:
+        - "emmersonmn"         # President's Instagram
+
+  # WEB SCRAPER - NEWS SITE SCRAPING
+  web_scraper:
+    enabled: true
+    
+    # Scraping interval (minutes)
+    scrape_interval: 120
+    
+    # Max articles per site per scrape
+    max_articles_per_site: 50
+    
+    # Storage for scraped content
+    storage_path: "scraped_content"
+    download_images: true
+    
+    # Duplicate detection
+    duplicate_detection:
+      enabled: true
+      similarity_threshold: 0.75
+      methods:
+        - title_match
+        - content_match
+        - url_check
+    
+    # Content analysis
+    analyze_content: true
+    extract_entities: true
+    analyze_sentiment: true
+    calculate_relevance: true
+    min_relevance_score: 0.5  # Skip articles below this relevance
+    
+    # SITE CATEGORIES - Pre-configured scraper targets
+    sites:
+      # ===== ZIMBABWE LOCAL NEWS (High Priority) =====
+      zimbabwe_local:
+        enabled: true
+        scrape_interval: 60
+        priority: 1
+        sites_to_scrape:
+          - herald           # The Herald Zimbabwe
+          - newsday          # NewsDay Zimbabwe
+          - bulawayo24       # Bulawayo24
+          - zimbabwean       # The Zimbabwean
+      
+      # ===== AFRICAN REGIONAL NEWS (Medium Priority) =====
+      regional_african:
+        enabled: true
+        scrape_interval: 120
+        priority: 2
+        sites_to_scrape:
+          - allafrica        # AllAfrica Zimbabwe
+          - mg               # Mail & Guardian Africa
+      
+      # ===== INTERNATIONAL NEWS (Low Priority - Zimbabwe coverage) =====
+      international:
+        enabled: true
+        scrape_interval: 180
+        priority: 3
+        sites_to_scrape:
+          - bbc_africa       # BBC Africa
+          - reuters          # Reuters Africa
+          - aljazeera        # Al Jazeera Africa
+    
+    # UNIFIED CONTENT ANALYSIS - Combine all sources
+    unified_analysis:
+      enabled: true
+      
+      # Analyze content from all sources together
+      sources_to_combine:
+        - rss_feeds          # Traditional RSS feeds
+        - scraped_articles   # Website scraping
+        - social_posts       # Social media influencers
+      
+      # Generate insights across all sources
+      generate_cross_source_insights: true
+      
+      # Weight different sources differently
+      source_weights:
+        social_posts: 1.2         # Social media gets 20% more weight (engagement matters)
+        rss_feeds: 1.0            # RSS baseline
+        scraped_articles: 1.1     # Scraped gets slightly more weight (fresher content)
+    
+    # Content filtering for scraping
+    content_filters:
+      # Minimum content length (characters)
+      min_content_length: 200
+      
+      # Keywords that indicate Zimbabwe relevance
+      must_have_keywords: []  # Empty = all articles accepted, add filters if needed
+      
+      # Skip articles with these keywords
+      exclude_keywords:
+        - sponsored
+        - advertisement
+        - promoted
+        - "native content"
+      
+      # Preferred content categories
+      preferred_categories:
+        - Politics
+        - Economy
+        - Business
+        - Technology
+        - Health
+        - Education
+
+  # PREDICTION SETTINGS
+  predictions:
+    enabled: true
+    
+    # Track prediction accuracy
+    track_accuracy: true
+    
+    # Minimum confidence for making predictions
+    min_confidence_for_prediction: 0.6
+    
+    # Days in future to forecast
+    forecast_horizon_days: 90
+    
+    # Risk factor sensitivity (0.0-1.0)
+    risk_sensitivity: 0.7
+
+  # PUBLICATION WORKFLOW
+  publication:
+    enabled: true
+    
+    # Auto-publish high-confidence articles
+    auto_publish_high_confidence: true
+    high_confidence_threshold: 0.80
+    
+    # Flag uncertain articles for review
+    flag_for_review: true
+    
+    # Require review for controversial topics
+    controversial_topics:
+      - politics
+      - elections
+      - government
+      - conflict
+    
+    # Publish to these channels
+    publish_to:
+      - rest_api          # Make available via API
+      - database          # Store in database
+      - webhook: false    # Send to external webhook (if configured)
+
+  # CONTENT ANALYSIS
+  content_analysis:
+    enabled: true
+    
+    # Extract and analyze
+    extract_politicians: true
+    extract_organizations: true
+    extract_locations: true
+    extract_issues: true
+    
+    # Sentiment analysis
+    analyze_sentiment: true
+    
+    # Language detection
+    detect_language: true
+
+  # STORAGE SETTINGS
+  storage:
+    # Store original content separately from generated
+    store_originals: true
+    store_generated: true
+    
+    # Retention policy (days, 0 = keep forever)
+    retention_days: 0
+    
+    # Archive old articles after N days
+    archive_after_days: 365
+
+
+# ============================================================
+# USER-DRIVEN ARTICLE REQUEST & THINKING SYSTEM
+# ============================================================
+article_requests:
+  # Enable/disable user article requests
+  enabled: true
+  
+  # USER PERMISSIONS
+  permissions:
+    # Who can submit article requests
+    can_submit_request:
+      - analyst
+      - reviewer
+      - admin
+    
+    # Who can contribute thinking
+    can_contribute_thinking:
+      - analyst
+      - reviewer
+      - admin
+    
+    # Who can approve/publish requests
+    can_approve:
+      - reviewer
+      - admin
+  
+  # REQUEST WORKFLOW
+  workflow:
+    # Auto-assign requests to reviewers
+    auto_assign: false
+    
+    # Default priority for new requests
+    default_priority: 2  # 1-5 scale
+    
+    # Request expiration (days, 0 = no expiration)
+    request_expiration_days: 90
+    
+    # Require approval before generation
+    require_approval: true
+    
+    # Escalate urgent requests (priority >= this)
+    escalate_priority_threshold: 4
+  
+  # THINKING CONTRIBUTIONS
+  thinking:
+    # Stages at which users can contribute thinking
+    enabled_stages:
+      - pre_generation      # Before article is generated
+      - draft_review        # After draft is available
+      - refinement          # During refinement
+      - final               # Final review
+    
+    # Types of thinking allowed
+    thinking_types:
+      - suggestion          # Suggested content/angles
+      - perspective         # Different viewpoint
+      - fact_check          # Fact checking/corrections
+      - improvement         # Suggestions for improvement
+      - analysis            # Additional analysis
+    
+    # How many thinking contributions per request
+    max_contributions_per_user: 10
+    max_total_contributions: 50
+    
+    # Track which thinking was incorporated
+    track_adoption: true
+    
+    # Minimum adoption priority (0-10) to auto-incorporate
+    auto_incorporate_priority: 8
+  
+  # ARTICLE GENERATION FROM REQUESTS
+  generation:
+    # Include user thinking in generation
+    include_user_thinking: true
+    
+    # Minimum thinking contributions before auto-generate
+    min_thinking_for_auto_generate: 0  # 0 = not required
+    
+    # Article types available for requests
+    allowed_article_types:
+      - historical
+      - present
+      - future
+      - analysis
+      - opinion
+    
+    # Target audiences
+    target_audiences:
+      - policymakers
+      - general_public
+      - investors
+      - academics
+      - media
+  
+  # NOTIFICATIONS
+  notifications:
+    enabled: true
+    
+    # Notify when thinking is added
+    notify_on_thinking: true
+    
+    # Notify when request is approved
+    notify_on_approval: true
+    
+    # Notify when article is generated
+    notify_on_generation: true
+    
+    # Notify contributors when their thinking is used
+    notify_on_adoption: true
+  
+  # STATISTICS & ANALYTICS
+  analytics:
+    # Track request metrics
+    track_metrics: true
+    
+    # Track thinking adoption rate
+    track_adoption_rate: true
+    
+    # Calculate contributor scores
+    calculate_contributor_scores: true
+    
+    # Award badges for contributions
+    use_gamification: true
+    badges:
+      - "First Request"
+      - "Prolific Thinker"
+      - "High Adoption Rate"
+      - "Subject Matter Expert"
+  
+  # API SETTINGS
+  api:
+    # Rate limiting (requests per hour)
+    rate_limit_per_hour: 60
+    
+    # Max request size (KB)
+    max_request_size: 100
+    
+    # Include user metadata in responses
+    include_user_info: false  # Privacy: don't expose user details
+    
+    # Paginate results
+    default_page_size: 20
+    max_page_size: 100

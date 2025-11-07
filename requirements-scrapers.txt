@@ -1,0 +1,11 @@
+beautifulsoup4
+lxml
+aiohttp
+cloudscraper
+prometheus_client
+requests
+requests-html
+# test helpers (already installed in venv for tests)
+pytest
+pytest-asyncio
+anyio

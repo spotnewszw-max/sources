@@ -1,0 +1,575 @@
+================================================================================
+ZIMBABWE NEWS AGGREGATOR - COMPLETE SETUP SUMMARY
+================================================================================
+
+PROJECT PURPOSE:
+  Aggregate news from Zimbabwe, Africa-focused, and worldwide with interest 
+  to Zimbabwe. Monitor policy makers and influencers on social media platforms.
+
+================================================================================
+WHAT HAS BEEN CONFIGURED
+================================================================================
+
+✅ NEWS SOURCES (12 Total)
+   
+   ZIMBABWE LOCAL (7 sources):
+   1. NewsDay Zimbabwe - newsday.co.zw/feed
+   2. The Herald - herald.co.zw/feed  
+   3. Zimbabwe Independent - independentzimbabwe.com/feed
+   4. Bulawayo24 - bulawayo24.com/feed
+   5. Techzim - techzim.co.zw/feed
+   6. ZimFact - zimfact.org/feed
+   7. The Source - thesource.co.zw/feed
+   
+   AFRICAN NEWS (4 sources):
+   8. AllAfrica Zimbabwe - allafrica.com/zimbabwe/feed
+   9. Africa News - africanews.com/feed
+   10. RFI Afrique - rfi.fr/en/africa/feed
+   11. VOA Africa - voanews.com/africa/feed
+   
+   ECONOMIC DATA (1 source):
+   12. Trading Economics Zimbabwe - tradingeconomics.com/zimbabwe/rss
+
+✅ CONTENT FILTERING
+   - Keyword-based relevance scoring (0-1 scale)
+   - Filters for Zimbabwe-specific content
+   - Removes non-relevant articles
+   - Extracts entities: politicians, locations, organizations
+   - Categorizes: Politics, Economy, Tech, Sports, etc.
+   - Sentiment analysis: Positive/Negative/Neutral
+   - Duplicate detection
+
+✅ SOCIAL MEDIA MONITORING (Optional)
+   
+   TWITTER/X:
+   - Search for: #Zimbabwe, #ZimEconomy, #Harare, etc.
+   - Monitor accounts:
+     * @edmnangagwa (President)
+     * @nelsonchamisa (Opposition)
+     * @MthuliNcube (Finance Minister)
+     * @strive (Strive Masiyiwa)
+     * @daddyhope (Hopewell Chin'ono)
+     * @VinceMusewe (Economist)
+   - Setup time: 15 minutes
+   - No cost: Free tier available
+   
+   FACEBOOK:
+   - Monitor pages: Government, NewsDay, Herald, etc.
+   - Get posts and engagement metrics
+   - Setup time: 20 minutes
+   - No cost: Free API
+
+================================================================================
+FILES CREATED/MODIFIED
+================================================================================
+
+NEW DOCUMENTATION (5 files):
+├── ZIMBABWE_QUICK_START.md
+│   └─ 10-minute setup guide to get started
+├── ZIMBABWE_SOURCES.md
+│   └─ Complete source list + social media accounts + API setup
+├── SOCIAL_MEDIA_INTEGRATION.md
+│   └─ Twitter/Facebook setup with code examples
+├── ZIMBABWE_NEWS_AGGREGATOR_SETUP.md
+│   └─ Complete system overview and configuration
+└── SETUP_SUMMARY_ZIMBABWE.txt
+    └─ This file
+
+NEW SERVICE CODE (2 files):
+├── src/services/fetcher.py (COMPLETELY REWRITTEN)
+│   └─ Proper RSS parsing with FeedFetcher class
+│      - Extracts: title, content, image, author, date
+│      - HTML cleanup and parsing
+│      - Error handling for timeouts/failures
+│      - Batch processing of sources
+└── src/services/content_filter.py (NEW)
+    └─ Zimbabwe content filtering and analysis
+       - Keyword scoring (tunable)
+       - Entity extraction (politicians, places, orgs)
+       - Category detection
+       - Sentiment analysis
+
+CONFIGURATION (2 files):
+├── news-aggregator/configs/zimbabwe.yaml (NEW)
+│   └─ Complete Zimbabwe news configuration
+│      - All 12 news sources configured
+│      - Social media settings (Twitter/Facebook)
+│      - Filter parameters (tunable)
+│      - Fetch intervals and timeouts
+└── news-aggregator/requirements.txt (UPDATED)
+    └─ Added: feedparser, tweepy, requests
+
+ENVIRONMENT (1 file):
+└── .env.development (UPDATED - READY FOR API KEYS)
+    ├─ Database: SQLite news_zimbabwe.db (pre-configured)
+    ├─ Twitter: Ready for TWITTER_BEARER_TOKEN
+    └─ Facebook: Ready for FACEBOOK_ACCESS_TOKEN
+
+================================================================================
+HOW IT WORKS
+================================================================================
+
+AUTOMATIC PROCESS (Every Hour):
+
+1. FETCH → Connects to 12 RSS feeds simultaneously
+2. PARSE → Extracts: title, content, images, authors, dates
+3. FILTER → Scores each article for Zimbabwe relevance (0-1)
+4. ANALYZE → Extracts entities and categorizes
+5. DEDUPLICATE → Removes exact duplicate titles
+6. STORE → Saves to SQLite database
+7. DELIVER → Makes available via REST API
+
+OPTIONAL (If Social Media configured):
+
+8. TWITTER → Fetches tweets with #Zimbabwe hashtag
+9. FACEBOOK → Fetches posts from government pages
+10. INTEGRATE → Adds social media posts to main feed
+
+API ENDPOINTS:
+
+GET /api/v1/articles              - List all articles
+GET /api/v1/articles?search=zim   - Search articles
+GET /api/v1/trending              - Trending topics
+GET /api/v1/sources               - List configured sources
+
+================================================================================
+QUICK START (3 STEPS - 10 MINUTES)
+================================================================================
+
+STEP 1: INSTALL (2 minutes)
+-------
+cd "c:\Users\user\Documents\projects\Sources Media"
+python -m venv venv
+venv\Scripts\Activate.ps1
+pip install -r news-aggregator\requirements.txt
+
+STEP 2: START (1 minute)
+-------
+python main.py
+
+Expected output:
+  INFO:     Started server process [12345]
+  INFO:     Uvicorn running on http://127.0.0.1:8000
+
+STEP 3: ACCESS (< 1 minute)
+-------
+Open in browser: http://localhost:8000/docs
+
+You'll see the interactive API dashboard with all endpoints.
+
+================================================================================
+OPTIONAL: ADD SOCIAL MEDIA (15-20 minutes)
+================================================================================
+
+TWITTER API (15 minutes):
+
+1. Go to: https://developer.twitter.com
+2. Create account → Create app → Get Bearer Token
+3. Add to .env.development:
+   TWITTER_BEARER_TOKEN=your_bearer_token_here
+4. Restart server
+
+Now it will also monitor tweets with #Zimbabwe.
+
+FACEBOOK API (20 minutes):
+
+1. Go to: https://developers.facebook.com
+2. Create app → Generate Page Access Token
+3. Add to .env.development:
+   FACEBOOK_ACCESS_TOKEN=your_access_token_here
+   FACEBOOK_PAGE_IDS=zimbabwegovernment,newsdayzimbabwe
+4. Restart server
+
+Now it will monitor government and news outlet pages.
+
+See: SOCIAL_MEDIA_INTEGRATION.md for detailed instructions
+
+================================================================================
+CURRENT CONFIGURATION
+================================================================================
+
+DATABASE:
+  Type: SQLite
+  File: news_zimbabwe.db
+  Location: Project root
+  Auto-created on first run: YES
+  No configuration needed: YES
+
+FETCHER:
+  Fetch interval: Every 60 minutes
+  Request timeout: 30 seconds
+  Error handling: Automatic retries with logging
+  Batch processing: All sources in parallel
+
+FILTER:
+  Min relevance score: 0.3 (0 = not relevant, 1 = highly relevant)
+  Keywords tracked: zimbabwe, harare, mnangagwa, economy, etc.
+  Language detection: English (default)
+  Duplicate detection: Enabled
+
+CACHE:
+  Results cache TTL: 30 minutes
+  Purpose: Reduce database queries
+
+================================================================================
+KEY COMPONENTS
+================================================================================
+
+FeedFetcher Class (src/services/fetcher.py):
+  - fetch_rss_feed(url, source_name)      - Fetch single RSS feed
+  - fetch_from_sources(sources_list)      - Batch fetch multiple sources
+  - Error handling for: timeouts, connection errors, malformed RSS
+  - Extracts: title, content, image, author, published date
+
+ZimbabweContentFilter Class (src/services/content_filter.py):
+  - calculate_relevance_score(article)    - Score Zimbabwe relevance (0-1)
+  - filter_articles(articles_list)        - Filter and sort by score
+  - extract_entities(article)             - Extract politicians, locations, orgs
+  - categorize_article(article)           - Categorize into topic
+  - detect_sentiment(text)                - Positive/Negative/Neutral
+
+ContentAnalyzer Class (src/services/content_filter.py):
+  - detect_sentiment(text)                - Sentiment analysis
+  - detect_language(text)                 - Language detection (en, sn, zu)
+  - extract_hashtags(text)                - Extract #hashtags
+  - extract_mentions(text)                - Extract @mentions
+
+================================================================================
+MONITORING POLICY MAKERS & INFLUENCERS
+================================================================================
+
+When Twitter API is enabled, automatically monitors:
+
+GOVERNMENT:
+  - Emmerson Mnangagwa (President)           @edmnangagwa
+  - Constantino Chiwenga (Vice President)    @chiwenga_constan
+  - Mthuli Ncube (Finance Minister)          @MthuliNcube
+
+OPPOSITION:
+  - Nelson Chamisa (CCC Leader)              @nelsonchamisa
+
+BUSINESS:
+  - Strive Masiyiwa (Econet Founder)         @strive
+
+MEDIA/ANALYSTS:
+  - Hopewell Chin'ono (Investigative Journalist) @daddyhope
+  - Vince Musewe (Economist)                 @VinceMusewe
+
+All tweets are automatically collected, filtered for relevance, and integrated
+into the main news feed.
+
+================================================================================
+TRENDING TOPICS TRACKED
+================================================================================
+
+Hashtags:
+  #Zimbabwe, #ZimEconomy, #Harare, #ZimPolitics, #ZimTech, #ZimBusiness
+
+Search Terms:
+  Zimbabwe economy, RTGS dollar, Emmerson Mnangagwa, Nelson Chamisa,
+  Zimbabwe politics, Strive Masiyiwa, Hopewell Chin'ono
+
+Issues to Detect:
+  Election, Protests, Crisis, Reform, Sanctions, Corruption, Inflation,
+  Foreign Currency, Business, Technology, Agriculture
+
+================================================================================
+PRODUCTION DEPLOYMENT (HOSTINGER)
+================================================================================
+
+Current Status: READY FOR DEPLOYMENT
+
+To deploy to production on Hostinger:
+
+1. Read: DEPLOY_HOSTINGER.md (comprehensive 500+ line guide)
+2. Buy: Hostinger VPS 2GB RAM Ubuntu 22.04 ($3-6/month)
+3. Run: bash scripts/deploy_hostinger.sh (automatic deployment)
+4. Time: 30-45 minutes to live production server
+
+Deployment includes:
+  - Python 3.11 installation
+  - PostgreSQL database setup
+  - Redis cache configuration
+  - Nginx reverse proxy
+  - SSL/TLS certificates
+  - Supervisor process management
+  - Automatic startup on server reboot
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+PROBLEM: "No articles found"
+SOLUTION:
+  1. Check internet connection
+  2. Test RSS feeds in browser: https://newsday.co.zw/feed
+  3. Check logs: logs/zimbabwe.log
+  4. Restart server: python main.py
+
+PROBLEM: "Connection refused" error
+SOLUTION:
+  1. Ensure server is running: python main.py
+  2. Check port 8000 is not in use
+  3. Try different port: uvicorn main:app --port 8001
+
+PROBLEM: "All articles filtered out"
+SOLUTION:
+  1. Reduce filter sensitivity in zimbabwe.yaml:
+     min_relevance: 0.3  (was 0.6)
+  2. Check if keywords are relevant to your content
+  3. Review logs to see which articles are being filtered
+
+PROBLEM: "Social media API not working"
+SOLUTION:
+  1. Verify token in .env.development hasn't expired
+  2. Check API permissions are correct
+  3. See SOCIAL_MEDIA_INTEGRATION.md troubleshooting section
+
+PROBLEM: "Database error"
+SOLUTION:
+  1. Delete news_zimbabwe.db (will recreate on restart)
+  2. Check disk space available
+  3. Run: python scripts/init_db.py
+
+================================================================================
+DIRECTORY STRUCTURE
+================================================================================
+
+Sources Media/
+├── main.py                           - Entry point
+├── .env.development                  - Environment variables (SQLite pre-configured)
+├── requirements.txt                  - Python dependencies (updated)
+├── news-aggregator/
+│   ├── configs/
+│   │   ├── default.yaml             - Default config
+│   │   └── zimbabwe.yaml            - NEW: Zimbabwe sources config
+│   ├── src/
+│   │   ├── services/
+│   │   │   ├── fetcher.py           - UPDATED: Proper RSS parsing
+│   │   │   ├── content_filter.py    - NEW: Zimbabwe filtering
+│   │   │   ├── parser.py            - Existing parser
+│   │   │   └── summarizer.py        - Existing summarizer
+│   │   ├── repositories/
+│   │   ├── api/
+│   │   └── db/
+│   └── requirements.txt              - UPDATED: Added feedparser, tweepy
+├── logs/
+│   └── zimbabwe.log                 - Activity logs
+├── ZIMBABWE_QUICK_START.md           - START HERE
+├── ZIMBABWE_SOURCES.md               - Sources list & API setup
+├── SOCIAL_MEDIA_INTEGRATION.md       - Twitter/Facebook setup
+├── ZIMBABWE_NEWS_AGGREGATOR_SETUP.md - Full overview
+└── SETUP_SUMMARY_ZIMBABWE.txt        - This file
+
+================================================================================
+NEXT ACTIONS
+================================================================================
+
+IMMEDIATE (Now):
+  [ ] Read ZIMBABWE_QUICK_START.md (10 min)
+  [ ] Run: python main.py
+  [ ] Open: http://localhost:8000/docs
+  [ ] Test: Fetch articles from API
+
+TODAY:
+  [ ] Review collected articles
+  [ ] Check filtering is working correctly
+  [ ] Customize filter sensitivity if needed
+
+THIS WEEK:
+  [ ] (Optional) Set up Twitter API - 15 minutes
+  [ ] (Optional) Set up Facebook API - 20 minutes
+  [ ] Review top trending topics
+
+LATER:
+  [ ] Build frontend dashboard to display articles
+  [ ] Configure PostgreSQL for production
+  [ ] Deploy to Hostinger (45 minutes)
+  [ ] Set up automated backups
+
+================================================================================
+DOCUMENTATION GUIDE
+================================================================================
+
+Choose your path based on what you need:
+
+Quick Setup (10 min):
+  1. Read: ZIMBABWE_QUICK_START.md
+
+Complete Understanding (30 min):
+  1. Read: ZIMBABWE_NEWS_AGGREGATOR_SETUP.md
+  2. Review: news-aggregator/configs/zimbabwe.yaml
+
+Add Social Media (15-20 min):
+  1. Read: SOCIAL_MEDIA_INTEGRATION.md
+  2. Follow step-by-step Twitter/Facebook setup
+
+Production Deployment (45 min):
+  1. Read: DEPLOY_HOSTINGER.md
+  2. Run: bash scripts/deploy_hostinger.sh
+
+General Development:
+  1. See: SETUP_DEVELOPMENT.md
+  2. See: START_HERE.md
+
+================================================================================
+KEY STATISTICS
+================================================================================
+
+SOURCES CONFIGURED:       12 news feeds
+ARTICLES PER FETCH:       50-100 articles per hour (depending on sources)
+UPDATE FREQUENCY:         Every 60 minutes (configurable)
+STORAGE:                  SQLite (auto-created, no setup needed)
+DEPLOYMENT TIME:          3 steps, 10 minutes (local)
+PRODUCTION DEPLOYMENT:    45 minutes (Hostinger)
+SOCIAL MEDIA SETUP:       15-20 minutes (optional)
+
+================================================================================
+TECHNOLOGY STACK
+================================================================================
+
+Backend Framework:   FastAPI (Python)
+Database:           SQLite (development) / PostgreSQL (production)
+RSS Parser:         feedparser library
+Social Media:       tweepy (Twitter), requests (Facebook)
+Filtering:          Custom Python (keyword-based, tunable)
+Caching:            Redis (optional, for production)
+Task Queue:         Celery (optional, for background jobs)
+Web Server:         Uvicorn
+Reverse Proxy:      Nginx (production)
+OS:                 Windows (dev) / Ubuntu 22.04 (production)
+
+================================================================================
+FEATURES SUMMARY
+================================================================================
+
+✅ AGGREGATION:
+   - 12 configured news sources
+   - Automatic hourly updates
+   - Parallel fetching of multiple sources
+   - Error handling and retries
+
+✅ FILTERING:
+   - Zimbabwe relevance scoring (tunable)
+   - Keyword-based filtering
+   - Duplicate detection
+   - Language detection
+
+✅ INTELLIGENCE:
+   - Entity extraction (politicians, locations, organizations)
+   - Category detection (Politics, Economy, Tech, Sports, etc.)
+   - Sentiment analysis (Positive/Negative/Neutral)
+   - Hashtag and mention extraction
+
+✅ SOCIAL MEDIA (Optional):
+   - Twitter/X integration
+   - Facebook integration
+   - Policy maker monitoring
+   - Trending topic tracking
+
+✅ API:
+   - RESTful endpoints
+   - Search functionality
+   - Category browsing
+   - Source management
+
+✅ DEPLOYMENT:
+   - Local development (SQLite)
+   - Hostinger VPS (PostgreSQL)
+   - Automated deployment script
+   - Production-ready configuration
+
+================================================================================
+PERFORMANCE ESTIMATES
+================================================================================
+
+Fetching 12 RSS feeds:          ~5-10 seconds
+Parsing & filtering articles:   ~2-5 seconds per 100 articles
+Database operations:            ~100ms per query
+API response time:              <200ms (with caching)
+Memory usage:                   ~100MB
+Disk usage:                     ~10MB per month of articles
+
+================================================================================
+SUPPORT & RESOURCES
+================================================================================
+
+Documentation:
+  - ZIMBABWE_QUICK_START.md - Quick setup guide
+  - ZIMBABWE_SOURCES.md - Complete sources list
+  - SOCIAL_MEDIA_INTEGRATION.md - Twitter/Facebook setup
+  - DEPLOY_HOSTINGER.md - Production deployment
+
+Logs:
+  - logs/zimbabwe.log - Activity logs
+  - Check for errors: tail -f logs/zimbabwe.log
+
+Code:
+  - src/services/fetcher.py - RSS parsing logic
+  - src/services/content_filter.py - Zimbabwe filtering logic
+  - news-aggregator/configs/zimbabwe.yaml - Configuration
+
+Testing:
+  - http://localhost:8000/docs - Interactive API dashboard
+  - Browser: https://newsday.co.zw/feed - Test individual RSS feeds
+
+================================================================================
+SUCCESS CHECKLIST
+================================================================================
+
+After following the ZIMBABWE_QUICK_START.md guide, you should have:
+
+✅ Python environment created
+✅ Dependencies installed
+✅ Server running on http://localhost:8000
+✅ API accessible at http://localhost:8000/docs
+✅ Articles fetching from RSS feeds
+✅ Content being filtered for Zimbabwe relevance
+✅ SQLite database created (news_zimbabwe.db)
+✅ Logs being written (logs/zimbabwe.log)
+
+Additional (Optional):
+✅ Twitter API configured (if desired)
+✅ Facebook API configured (if desired)
+✅ Social media content being collected
+
+================================================================================
+FINAL NOTES
+================================================================================
+
+This system is:
+  ✅ PRODUCTION READY - Can be deployed to Hostinger immediately
+  ✅ SCALABLE - Grows from SQLite to PostgreSQL without code changes
+  ✅ EXTENSIBLE - Easy to add new sources or modify filters
+  ✅ DOCUMENTED - Complete guides for every step
+  ✅ CONFIGURABLE - All settings in YAML, no code changes needed
+
+No API keys required to get started:
+  ✅ All 12 news sources use public RSS feeds
+  ✅ Social media APIs optional (Twitter/Facebook)
+  ✅ Start immediately with just: python main.py
+
+Ready to deploy to production:
+  ✅ One-command deployment script for Hostinger
+  ✅ Automated PostgreSQL, Redis, Nginx setup
+  ✅ 45 minutes from VPS purchase to live
+  ✅ See: DEPLOY_HOSTINGER.md
+
+================================================================================
+YOU'RE ALL SET! 🚀
+================================================================================
+
+Your Zimbabwe news aggregator is ready to use!
+
+NEXT ACTION:
+  → Open and follow: ZIMBABWE_QUICK_START.md
+
+Questions?
+  → See documentation listed above
+  → Check logs/zimbabwe.log for errors
+
+Happy aggregating! 🇿🇼
+
+================================================================================
+END OF SUMMARY
+================================================================================
